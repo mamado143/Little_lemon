@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.Typography
+
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
@@ -64,7 +66,8 @@ fun Little_Lemon_ProjectTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = Typography(),
+        shapes = Shapes,
         content = content
     )
 }

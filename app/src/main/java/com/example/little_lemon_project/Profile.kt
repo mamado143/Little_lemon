@@ -1,70 +1,110 @@
 package com.example.little_lemon_project
 
-import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(navController: NavHostController, context: Context) {
-    val sharedPreferences = context.getSharedPreferences("my_app_preferences", Context.MODE_PRIVATE)
-    val firstName = sharedPreferences.getString("first_name", "") ?: ""
-    val lastName = sharedPreferences.getString("last_name", "") ?: ""
-    val email = sharedPreferences.getString("email", "") ?: ""
-
+fun Profile(navController: NavController, sharedPreferences: SharedPreferences) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
-        // Header with logo
+        var firstName = sharedPreferences.getString("firstName", "FIRST NAME")!!
+        var lastName = sharedPreferences.getString("lastName", "LAST NAME")!!
+        var email = sharedPreferences.getString("email", "EMAIL")!!
         Image(
             painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo",
-            modifier = Modifier.fillMaxWidth()
+            contentDescription = "Little Lemon logo",
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.1f)
+        )
+        Text(
+            text = "Personal information",
+            fontSize = 20.sp,
+            style = MaterialTheme.typography.displayLarge,
+            color = Color(0xFF333333),
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 20.dp)
         )
 
-        // Profile information
-        Text(text = "Profile information:")
-        Text(text = "First Name: $firstName")
-        Text(text = "Last Name: $lastName")
-        Text(text = "Email: $email")
+        Column(
+            Modifier
+                .fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = {},//newText: String -> firstName=newText
+                label = {
+                    Text(text = "First name", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = {},//newText: String -> lastName=newText
+                label = {
+                    Text(text = "Last name", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = email,
+                onValueChange = {},//newText: String -> email=newText
+                label = {
+                    Text(text = "e-Mail", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            )
 
-        // Logout button
+        }
+
         Button(
             onClick = {
-                // Clear shared preferences
-                val editor = sharedPreferences.edit()
-                editor.clear()
-                editor.apply()
-
-                // Navigate to Onboarding screen
-                navController.navigate(Destinations.Onboarding)
+                sharedPreferences.edit().putBoolean("loggedIn", false).commit()
+                navController.navigate(Onboarding.route)
             },
+            colors = ButtonDefaults.buttonColors(
+                Color(0xFFF4CE14)
+            ),
+
             modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 16.dp)
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
         ) {
-            Text(text = "Log out")
+            Text(
+                text = "Log Out",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
         }
+
+
     }
-}
-
-@Composable
-@Preview (showBackground = true)
-fun ProfilePreview() {
-    val mockNavController = rememberNavController() // Import rememberNavController if needed
-    val mockContext = LocalContext.current
-
-    Profile(navController = mockNavController, context = mockContext)
 }

@@ -1,32 +1,38 @@
 package com.example.little_lemon_project
 
-import androidx.room.RoomDatabase
-import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@Entity(tableName = "menu_items")
-data class MenuItemEntity(
-    @PrimaryKey val id: Int,
-    val title: String,
-    val description: String,
-    val price: Double,
-    val image: String
+@Serializable
+data class MenuNetwork(
+    // add code here
+    @SerialName("menu")
+    var menu: List<MenuItemNetwork>
+
 )
 
-@Dao
-interface MenuItemDao {
-    @Insert
-    fun insertMenuItem(menuItem: MenuItemEntity)
-
-    @Query("SELECT * FROM menu_items")
-    fun getMenuItems(): List<MenuItemEntity>
-}
-
-@Database(entities = [MenuItemEntity::class], version = 1)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun menuItemDao(): MenuItemDao
+@Serializable
+data class MenuItemNetwork(
+    // add code here
+    @SerialName("id")
+    var id    : Int?    = null,
+    @SerialName("title")
+    var title : String? = null,
+    @SerialName("description")
+    var description: String? = null,
+    @SerialName("price")
+    var price : String? = null,
+    @SerialName("image")
+    var image : String? = null,
+    @SerialName("category")
+    var category : String? = null
+){
+    fun toMenuItemRoom() = MenuItemRoom(
+        id!!,
+        title!!,
+        description!!,
+        price!!.toDouble(),
+        image!!,
+        category!!
+    )
 }
