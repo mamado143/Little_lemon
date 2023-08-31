@@ -1,5 +1,7 @@
 package com.example.little_lemon_project
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,15 +18,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.little_lemon_project.ui.theme.Little_Lemon_ProjectTheme
+import androidx.navigation.NavHostController
+import com.example.little_lemon_project.Destinations.Companion.Home
 
 @Composable
-fun Onboarding() {
+fun Onboarding(navController: NavHostController, context: Context) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,13 +44,14 @@ fun Onboarding() {
 
             )
 
-        PersonalInfo()
+        PersonalInfo(navController = navController, context = context)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalInfo() {
+fun PersonalInfo(navController: NavHostController, context: Context) {
+
     var FirstName = remember {
         mutableStateOf(TextFieldValue(""))
     }
@@ -60,6 +61,7 @@ fun PersonalInfo() {
     var Email = remember {
         mutableStateOf(TextFieldValue(""))
     }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -91,22 +93,48 @@ fun PersonalInfo() {
 
     }
     Button(
-        onClick = { /*TODO*/ },
+        onClick = {
+            val firstName = FirstName.value
+            val lastName = LastName.value
+            val email = Email.value
+
+            if (isInputValid(firstName, lastName, email)) {
+                // Save user data to SharedPreferences
+                val sharedPreferences: SharedPreferences =
+                    context.getSharedPreferences("my_app_preferences", Context.MODE_PRIVATE)
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                editor.putString("first_name", firstName.toString())
+                editor.putString("last_name", lastName.toString())
+                editor.putString("email", email.toString())
+
+                editor.apply()
+                // Print a success message
+                println("Registration successful!")
+
+                // Navigate to Home screen
+                navController.navigate(Home)
+            } else {
+                // Show validation error message
+                println("Registration unsuccessful. Please enter all data.")
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-
-        ) {
-        Text(
-            text = "Register")
+            .padding(vertical = 8.dp)
+    ) {
+        Text(text = "Register")
     }
 }
 
+private fun isInputValid(
+    firstName: TextFieldValue,
+    lastName: TextFieldValue,
+    email: TextFieldValue
+): Boolean {
+    return firstName.isNotBlank() && lastName.isNotBlank() && email.isNotBlank()
+}
 
-@Preview(showBackground = true)
-@Composable
-fun OnboardingPreview() {
-    Little_Lemon_ProjectTheme {
-        Onboarding()
-    }
+private fun TextFieldValue.isNotBlank(): Boolean {
+    return text.isNotBlank()
+
 }
